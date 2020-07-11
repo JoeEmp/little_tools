@@ -12,7 +12,7 @@ import time
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.schedulers.qt import QtScheduler
 
-class my_aps(QtScheduler):
+class my_aps(BackgroundScheduler):
     def __init__(self, gconfig={}, **options):
         super().__init__(gconfig=gconfig, **options)
         self.mission_ids = list()
@@ -63,8 +63,16 @@ class my_aps(QtScheduler):
         for mission in missions:
             self.update_mission(mission)
 
+    def add_interval_job(self):
+        pass
 
-MYAPS = my_aps()
+    def add_cron_job(self):
+        pass
+
+    def add_date_job(self):
+        pass
+
+MYAPS = my_aps(timezone="Asia/Shanghai")
 
 
 def set_aps(widget, *args, **kwargs):

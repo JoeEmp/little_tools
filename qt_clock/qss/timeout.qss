@@ -1,0 +1,27 @@
+QWidget#top_widget_h {
+    background-color: #53d37e;
+    border-radius: 15px;
+}
+
+QWidget#top_widget_d {
+    background-color: #46b46a;
+    border-radius: 15px;
+}
+
+QLabel {
+    font-family: YouYuan;
+    color: #ffffff;
+    border: solid #000000 3px;
+}
+
+QLabel#lab_tips {
+    font-size: 16pt
+}
+
+QLabel#lab_date {
+    font-size: 16pt
+}
+
+QLabel#lab_time {
+    font-size: 64pt;
+}

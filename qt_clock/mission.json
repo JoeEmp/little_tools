@@ -1,0 +1,11 @@
+{
+    "f85567ea35f52e6a4a5380811b3ac4d4": {
+        "trigger": "interval",
+        "time": 10,
+        "is_action": false,
+        "mission_name": "rest from json",
+        "id": "f85567ea35f52e6a4a5380811b3ac4d4",
+        "creattime": "2020-07-08 19:00:47",
+        "sign": "8088d30008e2cb2046a8a96e972c7942"
+    }
+}

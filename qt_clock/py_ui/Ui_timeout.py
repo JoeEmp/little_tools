@@ -24,6 +24,7 @@ from utils.clock_thread import Clock,ClockThread,test_thread
 from PyQt5.QtCore import QTimer, Qt
 import logging
 import time
+import platform
 
 class Ui_Timeout(UntitleWindow):
     def __init__(self,parent=None):
@@ -32,7 +33,11 @@ class Ui_Timeout(UntitleWindow):
 
 
     def setup(self):
-        self.read_qss(filename='./qss/timeout.qss')
+        # 暂时不是区分 mac 和 linux
+        if platform.system().lower()  == 'windows':
+            self.read_qss(filename='./qss/win_timeout.qss')
+        else:
+            self.read_qss(filename='./qss/timeout.qss')
         self.setupUi()
         self.clock = None
         self.set_models()
@@ -53,13 +58,12 @@ class Ui_Timeout(UntitleWindow):
         self.lab_date.setAlignment(
             QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
         self.lab_date.setObjectName("lab_date")
-        self.lab_date.setStyleSheet(self.qss)
         self.gridLayout.addWidget(self.lab_date, 0, 0, 1, 1)
         self.verticalLayout = QtWidgets.QVBoxLayout()
         self.lab_time = QtWidgets.QLabel(self.gridLayoutWidget)
         self.lab_time.setAlignment(QtCore.Qt.AlignHCenter | QtCore.Qt.AlignTop)
+        self.lab_time.setFixedHeight(100)
         self.lab_time.setObjectName("lab_time")
-        self.lab_time.setStyleSheet(self.qss)
         self.lab_tips = QtWidgets.QLabel(self.gridLayoutWidget)
         self.lab_tips.setAlignment(QtCore.Qt.AlignHCenter | QtCore.Qt.AlignTop)
         self.lab_tips.setObjectName("lab_tips")
@@ -84,19 +88,7 @@ class Ui_Timeout(UntitleWindow):
     def retranslateUi(self):
         _translate = QtCore.QCoreApplication.translate
         self.lab_date.setText("%s" % get_date())
-        self.lab_time.setText("""
-        <html>
-        
-        <head>
-            <head/>
-        
-            <body>
-                <p style=\" font-size:64pt; color:#ffffff\">{}</p>
-                <p style=\" font-size:12pt; color:#ffffff;\"></p>
-            </body>
-        
-        </html>        
-        """.format(get_time()))
+        self.lab_time.setText("{}".format(get_time()))
         self.lab_tips.setText("""今日咖啡\n危地马拉 安提瓜花神咖啡（Guatemala La Minita La Folie）\n产区： 安提瓜（Antigua）火山区\n庄园： 拉米尼塔（La Minita） \n出口： 拉米妮塔（La Minita）集团的品牌"花神"\n品种：   Caturra, Catuai, Borbon\n波旁、卡杜拉、卡杜艾\n海拔：   1200至1600米\n等级：  欧规水洗极硬豆（SHB）\n处理法：传统式水洗处理
         """)
         self.btn_pass.setText("Pass")
@@ -110,12 +102,11 @@ class Ui_Timeout(UntitleWindow):
 
     def show(self):
         try:
-            logging.warning("{}".format(time.time()))
             width = QApplication.desktop().screenGeometry().width()
             height = QApplication.desktop().screenGeometry().height()
-            self.resize(int(width * 0.8), int(height * 0.7))
+            self.resize(int(width * 0.8), int(height * 0.8))
             self.gridLayoutWidget.setGeometry(
-                QtCore.QRect(20, 20, int(width * 0.8) - 40, int(height * 0.7) - 40))
+                QtCore.QRect(20, 20, int(width * 0.8) - 40, int(height * 0.8) - 40))
             self.raise_()
             super().show()
         except Exception as e:
@@ -123,7 +114,12 @@ class Ui_Timeout(UntitleWindow):
 
     def update_ui(self):
         self.lab_date.setText("%s" % get_date())
-        self.lab_time.setText('{}'.format(get_time()))
+        self.lab_time.setText("{}".format(get_time()))
+        # if "top_widget_h" == self.objectName():
+        #     self.setObjectName('top_widget_d')
+        # else:
+        #     self.setObjectName('top_widget_h')
+        # self.setStyleSheet(self.qss)
         logging.debug('update date')
 
 

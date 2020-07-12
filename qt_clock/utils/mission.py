@@ -9,7 +9,7 @@
 import os
 import json
 import logging
-from utils.utils import get_datetime, cryptograph_text
+from utils.utils import get_full_datetime, cryptograph_text
 from config import MISSION_CONFIG
 from utils.aps import MYAPS
 
@@ -77,14 +77,9 @@ class TimeMission():
         """
         if not self.missions:
             self.missions = self.get_json(filename)
-        datetime = get_datetime()
-        mission_id = cryptograph_text(
-            mission['mission_name'] + datetime)  # set aps_id
-        mission['id'] = mission_id
-        mission['creattime'] = datetime
-        self.missions[mission_id] = mission
-        self.update_file(filename)
-        # to do add aps
+            MYAPS.set_json_jobs(self.missions)
+        
+        # add aps
         MYAPS.add_json_job(mission)
 
     def get_mission(self, mission_id: str) -> dict:
@@ -115,13 +110,15 @@ class TimeMission():
                 self.add_mission(mission)
 
     def del_mission(self, mission_id) -> bool:
-        """去除内存和aps的任务配置，不会更新文件
+        """去除内存和aps以及文件的任务配置
 
         :param mission_id:任务id
         :return:
         """
         try:
             self.missions.pop(mission_id)
+            self.update_file()
+            # remove aps job
             MYAPS.remove_job(mission_id)
             return True
         except Exception as e:

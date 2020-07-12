@@ -13,7 +13,7 @@ from PyQt5.QtGui import QMouseEvent
 from PyQt5.QtWidgets import QLineEdit, QListWidgetItem, QPushButton, QWidget, \
     QTimeEdit, QMainWindow
 from PyQt5 import QtCore, QtQuickWidgets, QtWidgets
-from utils.utils import cryptograph_text
+from utils.utils import cryptograph_text,get_full_datetime
 from PyQt5.Qt import QColor, QUrl
 import json
 
@@ -201,7 +201,7 @@ class TimeItem(QListWidgetItem):
         """
         flag = False
         if 'luck' == self.info['id']:
-            self.info['name'] = cryptograph_text(int(time.time()))
+            self.info['id'] = cryptograph_text(str(int(time.time())))
         index = self.comboBox.currentIndex()
         self.info['trigger'] = list(self.comboBoxSel.values())[index]
         self.info['is_action'] = self.radioButton.isChecked()
@@ -211,6 +211,7 @@ class TimeItem(QListWidgetItem):
             'time'] = aps_time.hour() * 3600 + aps_time.minute() * 60 + aps_time.second()
         # 新任务无sign
         if 'sign' not in self.info.keys():
+            self.info['createtime'] = get_full_datetime()
             # 存在json转jsonstr保留空格的情况，目前没有好办法，只能做替换
             self.info['sign'] = cryptograph_text(json.dumps(self.info).replace(' ',''))
             flag  = True

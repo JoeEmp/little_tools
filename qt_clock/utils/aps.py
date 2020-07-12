@@ -15,13 +15,14 @@ from apscheduler.schedulers.qt import QtScheduler
 class my_aps(BackgroundScheduler):
     def __init__(self, gconfig={}, **options):
         super().__init__(gconfig=gconfig, **options)
-        self.mission_ids = list()
+        self.mission_ids = set()
         self.__widget = None
 
     def set_widget(self, widget):
         self.__widget = widget
 
-    def set_json_job(self, missions, widgets=None):
+    def set_json_jobs(self, missions, widgets=None):
+        """ 初始化任务"""
         self.remove_all_jobs()
         logging.info('missions is %r' % missions)
         self.add_json_jobs(missions, widgets)
@@ -56,7 +57,9 @@ class my_aps(BackgroundScheduler):
             self.reschedule_job(mission['id'], trigger=mission['trigger'],
                                 seconds=mission['time'])
         else:
-            self.get_job(mission['id']).pause()
+            mission  = self.get_job(mission['id'])
+            if mission:
+                mission.pause()
         logging.info('aps update mission {}'.format(mission))
 
     def update_missions(self, missions):

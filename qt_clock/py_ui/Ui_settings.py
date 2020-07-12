@@ -25,11 +25,8 @@ class Ui_Settings(object):
         self.setupUi(self.widget)
         self.set_connect()
 
-    def get_infos(self) -> dict:
-        return TIME_MISSION.missions
-
     def set_data(self):
-        self.missions = self.get_infos()
+        self.del_missions = set()          # 需要被去除的的任务配置
 
     def set_connect(self):
         self.btn_save.clicked.connect(self.save)
@@ -51,11 +48,11 @@ class Ui_Settings(object):
         self.listWidget = QtWidgets.QListWidget(self.verticalLayoutWidget)
         self.listWidget.setObjectName("listWidget")
         self.listWidget.setFixedWidth(self.verticalLayoutWidget.width())
-        for mission_id in self.missions:
+        for mission_id in TIME_MISSION.missionss:
             self.item = TimeItem(self.listWidget)
             self.listWidget.setItemWidget(self.item,
                                           self.item.setupUi(
-                                              info=self.missions[mission_id]))
+                                              info=TIME_MISSION.missionss[mission_id]))
         self.verticalLayout.addWidget(self.listWidget)
         self.horizontalLayout = QtWidgets.QHBoxLayout()
         self.horizontalLayout.setObjectName("horizontalLayout")
@@ -80,18 +77,26 @@ class Ui_Settings(object):
         self.widget = Form
 
     def refreash_items(self, is_save):
-        for i in range(self.listWidget.count()):
-            item = self.listWidget.item(i)
-            # logging.warning('item info is {}'.format(item.info))
-            if is_save:
+        if is_save:
+            for i in range(self.listWidget.count()):
+                item = self.listWidget.item(i)
                 flag = item.update_info()
                 TIME_MISSION.update_mission(item.info,flag)
-            else:
-                item.set_data(info=TIME_MISSION.missions[item.info['id']])
+            for mission_id in self.del_missions:
+                TIME_MISSION.del_mission(mission_id)
+            self.del_missions.clear()
+        else:
+            self.listWidget.clear()
+            for mission_id in TIME_MISSION.missions:
+                self.item = TimeItem(self.listWidget)
+                self.listWidget.setItemWidget(self.item,
+                                              self.item.setupUi(
+                                                  info=TIME_MISSION.missions[mission_id]))
 
     def save(self):
         self.btn_save.setDisabled(True)
         self.refreash_items(True)
+        # self.update_to_TIME_MISSION()
         self.btn_save.setEnabled(True)
         self.widget.hide()
         # logging.warning(TIME_MISSION.missions)
@@ -109,16 +114,18 @@ class Ui_Settings(object):
         self.btn_save.setText(_translate("Form", "save"))
         self.btn_cancel.setText(_translate("Form", "cancel"))
 
-    def add_item(self):
+    def add_item(self,mission=None):
         self.item = TimeItem(self.listWidget)
-        self.listWidget.setItemWidget(self.item, self.item.setupUi())
+        if mission:
+            self.listWidget.setItemWidget(self.item, self.item.setupUi(info=mission))
+        else:
+            self.listWidget.setItemWidget(self.item, self.item.setupUi())
 
     def del_item(self):
         cur_index = self.listWidget.currentRow()
         if  -1 !=  cur_index :
             try:
-                itme = self.listWidget.currentItem()
-                TIME_MISSION.del_mission(item.info['id'])
+                self.del_missions.add(self.listWidget.currentItem().info['id'])
                 self.listWidget.takeItem(cur_index)
                 self.listWidget.setCurrentRow(-1)
             except Exception as e:

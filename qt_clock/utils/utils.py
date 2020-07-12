@@ -13,14 +13,14 @@ import hashlib
 from PyQt5.Qt import QIcon
 from PyQt5 import QtGui
 from PyQt5.QtWidgets import QApplication
-
+import pytz
+from datetime import datetime
 
 def cryptograph_text(text):
-    """
-    暂时只提供md5加密
+    """��ʱֻ�ṩmd5����.
 
     Arguments:\n
-            text {str} -- 需要加密的文本
+            text {str} -- ��Ҫ���ܵ��ı�
 
     Returns:\n
             str -- 密文或者空
@@ -31,16 +31,25 @@ def cryptograph_text(text):
     return m.hexdigest()
 
 
+def get_datetime(date_format):
+    if ('Asi','a/S') == time.tzname:
+        tz = pytz.timezone('Asia/Shanghai')
+        dt = datetime.fromtimestamp(int(time.time()),tz)
+        return dt.strftime(date_format)
+    else:
+        return time.strftime(date_format, time.localtime(time.time()))
+
+
 def get_date():
-    return time.strftime("%Y-%m-%d", time.localtime(time.time()))
+    return get_datetime("%Y-%m-%d")
 
 
 def get_time():
-    return time.strftime("%H:%M:%S", time.localtime(time.time()))
+    return get_datetime("%H:%M:%S")
 
+def get_full_datetime():
+    return get_datetime("%Y-%m-%d %H:%M:%S")
 
-def get_datetime():
-    return time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time()))
 
 
 def set_app(app):

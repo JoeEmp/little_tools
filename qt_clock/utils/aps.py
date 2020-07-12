@@ -72,7 +72,10 @@ class my_aps(BackgroundScheduler):
     def add_date_job(self):
         pass
 
-MYAPS = my_aps(timezone="Asia/Shanghai")
+if ('Asi','a/S') == time.tzname:
+    MYAPS = my_aps(timezone="Asia/Shanghai")
+else:
+    MYAPS = my_aps()
 
 
 def set_aps(widget, *args, **kwargs):

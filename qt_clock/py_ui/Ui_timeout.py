@@ -23,7 +23,7 @@ from utils.utils import get_date, get_time
 from utils.clock_thread import Clock,ClockThread,test_thread
 from PyQt5.QtCore import QTimer, Qt
 import logging
-
+import time
 
 class Ui_Timeout(UntitleWindow):
     def __init__(self,parent=None):
@@ -37,7 +37,6 @@ class Ui_Timeout(UntitleWindow):
         self.clock = None
         self.set_models()
         self.set_connect()
-        logging.error(" __init__ ")
 
 
     def setupUi(self):
@@ -111,6 +110,7 @@ class Ui_Timeout(UntitleWindow):
 
     def show(self):
         try:
+            logging.warning("{}".format(time.time()))
             width = QApplication.desktop().screenGeometry().width()
             height = QApplication.desktop().screenGeometry().height()
             self.resize(int(width * 0.8), int(height * 0.7))
@@ -118,13 +118,8 @@ class Ui_Timeout(UntitleWindow):
                 QtCore.QRect(20, 20, int(width * 0.8) - 40, int(height * 0.7) - 40))
             self.raise_()
             super().show()
-            # if self.__thread.isRunning():
-            #     pass
-            # else:
-            #     self.__thread.start()
         except Exception as e:
             logging.error(e)
-
 
     def update_ui(self):
         self.lab_date.setText("%s" % get_date())

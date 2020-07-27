@@ -10,6 +10,8 @@ import logging
 from PyQt5.QtCore import QCoreApplication
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QSystemTrayIcon, QMenu, QAction
+from utils.aps import MYAPS
+from utils.mission import TIME_MISSION
 
 
 class clock_tray(QSystemTrayIcon):
@@ -22,19 +24,19 @@ class clock_tray(QSystemTrayIcon):
         self.show()
 
     def set_menu(self, widget_dict):
-        '''
-        设置菜单
-        :param widget_dict: {'widget_name':widget_object}
-        :return:
-        '''
         self.widget_dict = widget_dict
         self.main_menu = QMenu()
-        self.show_action = QAction('&show',triggered=self.widget_dict['timeout_win'].show)
-        self.settings_action = QAction('&settings', triggered=self.widget_dict['settings_win'].show)
+        self.show_action = QAction(
+            '&show', triggered=self.widget_dict['timeout_win'].show)
+        self.settings_action = QAction(
+            '&settings', triggered=self.widget_dict['settings_win'].show)
+        self.reset_time_action = QAction(
+            '&reset time', triggered=self.reset_time)
         self.quit_action = QAction('&exit', triggered=self.quitapp)
 
         self.main_menu.addAction(self.show_action)
         self.main_menu.addAction(self.settings_action)
+        self.main_menu.addAction(self.reset_time_action)
         self.main_menu.addAction(self.quit_action)
 
         self.set_icon()
@@ -42,19 +44,10 @@ class clock_tray(QSystemTrayIcon):
         self.setContextMenu(self.main_menu)
 
     def set_icon(self):
-        '''
-        设置图标
-        :return:
-        '''
-        # 这里的路径从main.py 算起
         self.setIcon(QIcon('./icon/clock.png'))
         pass
 
     def set_data(self):
-        '''
-        设置data
-        :return:
-        '''
         self.setObjectName('time_tary')
         self.set_icon()
         self.setVisible(True)
@@ -69,3 +62,8 @@ class clock_tray(QSystemTrayIcon):
             self.setVisible(False)
         except Exception as e:
             logging.error(e)
+
+    def reset_time(self):
+        # 重启任务
+        for k, v in TIME_MISSION.missions.items():
+            MYAPS.update_mission(v)

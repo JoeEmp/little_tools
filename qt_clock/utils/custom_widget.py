@@ -1,5 +1,5 @@
 '''
-@Author: your name
+@Author: joe
 @Date: 2020-06-23 10:28:57
 @LastEditTime: 2020-06-29 17:26:20
 @LastEditors: Please set LastEditors
@@ -22,9 +22,6 @@ class Transparent(object):
 
     def set_base_qss(self, widget_name=None, qss=''):
         """支持自定义qss."""
-        if not qss and widget_name:
-            base_qss = """
-            %s{定义qss  """
         if not qss and widget_name:
             base_qss = """
             %s{
@@ -66,23 +63,21 @@ class UntitleWidget(QWidget):
 
     # 重写移动事件
     def mouseMoveEvent(self, e: QMouseEvent):
-        # if not self.geometry().contains(self.pos()):
         if self._startPos:
             self._endPos = e.pos() - self._startPos
             self.move(self.pos() + self._endPos)
 
     def mousePressEvent(self, e: QMouseEvent):
-        if e.button() == Qt.LeftButton:  # and not self.geometry().contains(self.pos()):
+        if e.button() == Qt.LeftButton:
             self._isTracking = True
             self._startPos = QPoint(e.x(), e.y())
 
     # 释放鼠标时做出判断保证正常贴边 bug：y轴没做限制
     def mouseReleaseEvent(self, e: QMouseEvent):
-        if e.button() == Qt.LeftButton:  # and not self.geometry().contains(self.pos()):
+        if e.button() == Qt.LeftButton:  
             self._isTracking = False
             self._startPos = None
             self._endPos = None
-        # print(self.x(), self.y())
 
 
 class UntitleWindow(QMainWindow):
@@ -195,10 +190,6 @@ class TimeItem(QListWidgetItem):
             logging.warning(e)
 
     def update_info(self) -> dict:
-        """更新配置.
-
-        :return:flag
-        """
         flag = False
         if 'luck' == self.info['id']:
             self.info['id'] = cryptograph_text(str(int(time.time())))
@@ -255,8 +246,8 @@ class TransparentLineEdit(QLineEdit, Transparent):
 
 class Toast(object):
     """Toast控件."""
-    long = 2000
-    short = 1000
+    Long = 2000
+    Short = 1000
 
     def __init__(self, parent, qml=''):
         """初始化widget.
@@ -278,13 +269,7 @@ class Toast(object):
     def show(self):
         self.toast.show()
 
-    def show_toast(self, text, time=short):
-        """
-
-        :param text: 显示文本
-        :param time: 显示时长(单位 ms)
-        :return:
-        """
+    def show_toast(self, text, time=Short):
         try:
             self.set_time(time)
             self.toast.rootObject().set_text(text)
@@ -303,13 +288,9 @@ class Toast(object):
         return self.toast.rootObject()
 
     def set_time(self, time):
-        """设置显示时间.
-
-        :param time: 单位为毫秒
-        :return:
-        """
+        """设置显示时间."""
         if isinstance(time, int):
-            self.toast.rootObject().set_time(time)
+            self.toast.rootObject().set_time(time) # 单位为毫秒
         else:
             self.toast.rootObject().set_time(self.short)
             logging.warning('time类型不对 {}'.format(type(time)))

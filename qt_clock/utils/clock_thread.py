@@ -11,59 +11,7 @@ from time import sleep
 from PyQt5.QtCore import QThread, pyqtSignal, QTimer, QObject
 from utils.utils import get_date,get_time
 
-class RemindTimer(QTimer):
-    # overSignal = pyqtSignal(str)
-
-    def __init__(self):
-        super().__init__()
-
-    def start(self, sec=1):
-        super().start(int(250*sec))
-
-    def free(self):
-        self.killTimer(self.timerId())
-
-
 class ClockThread(QThread):
-    def __init__(self, parent=None, *args, **kwargs):
-        super().__init__(parent)
-        if 'widget' in kwargs.keys():
-            self.widget = kwargs['widget']
-        else:
-            self.widget = None
-        
-    def run(self):
-        self.timer = RemindTimer()
-        self.timer.start()
-        self.timer.timeout.connect(self.update_widget_ui)
-
-    def update_widget_ui(self):
-        if self.widget:
-            self.widget.lab_date.setText("%s" % get_date())
-            self.widget.lab_time.setText('{}'.format(get_time()))
-            logging.debug('update date')
-
-
-class Clock(QObject):
-    def __init__(self, widget=None):
-        super().__init__()
-        # self.__timer = RemindTimer()
-        self.widget = widget
-        self.__th = ClockThread(widget=self.widget)
-        self.__th.start()
-
-    def run(self):
-        if self.__th.is_lock():
-            self.__th.set_lock(False)
-        print('clock is run')
-
-    def free(self):
-        self.__th.set_lock(True)
-    
-    def is_run(self):
-        return self.__th.isRunning()
-
-class test_thread(QThread):
     overSignal = pyqtSignal(str)
 
     def __init__(self, parent=None, *args, **kwargs):
@@ -86,7 +34,6 @@ class test_thread(QThread):
         self.exec()
 
     def send_signal(self):
-        # logging.info('emit timeout')
         return self.overSignal.emit('timeout')
     
     def stop(self):

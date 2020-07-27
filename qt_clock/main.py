@@ -16,7 +16,6 @@ from py_ui.TranSignal import TranSignalWidget
 from utils.aps import MYAPS, set_aps
 from utils.mission import TIME_MISSION
 from utils.utils import set_app
-from utils.clock_thread import ClockThread
 import logging
 
 
@@ -40,11 +39,12 @@ def main():
         timeout_win = Ui_Timeout(tray)
         settings_win = Ui_Settings(tray)
         tran_win = TranSignalWidget()
+        print(tran_win.styleSheet())
         tran_win.showSignal.connect(timeout_win.show)
         win_dict = {"timeout_win": timeout_win, 'settings_win': settings_win}
         tray.set_menu(win_dict)
         set_aps(tran_win)
-        settings_win.show()
+        timeout_win.show()
         TIME_MISSION.set_mission()
         MYAPS.start()
         logging.debug('APS jobs {}'.format(MYAPS.get_jobs()))

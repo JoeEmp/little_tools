@@ -44,11 +44,6 @@ class TimeMission():
             return dict()
 
     def update_json(self, filename=MISSION_CONFIG) -> bool:
-        """将设置保存到文件
-
-        :param filename: 配置文件，默认为 config文件的MISSION_CONFIG
-        :return:
-        """
         try:
             with open(filename, 'w') as f:
                 f.write(json.dumps(self.missions))
@@ -69,12 +64,6 @@ class TimeMission():
         MYAPS.add_json_jobs(self.missions)
 
     def add_mission(self, mission: dict, filename=MISSION_CONFIG):
-        """添加任务至文件，如没有文件则根据文件名创建文件.
-
-        :param mission: 任务配置信息
-        :param filename: 读取任务文件名
-        :return:
-        """
         if not self.missions:
             self.missions = self.get_json(filename)
             MYAPS.set_json_jobs(self.missions)
@@ -83,22 +72,12 @@ class TimeMission():
         MYAPS.add_json_job(mission)
 
     def get_mission(self, mission_id: str) -> dict:
-        """获取任务配置
-
-        :param mission_id:任务id
-        :return:
-        """
         try:
             return self.missions[mission_id]
         except Exception as e:
             return dict()
 
     def update_mission(self, mission: dict,flag: bool):
-        """更新任务，如果没有任务则新增
-
-        :param mission:任务配置
-        :return:
-        """
         if flag:
             try:
                 mission_id = mission['id']

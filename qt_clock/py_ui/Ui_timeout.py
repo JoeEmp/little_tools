@@ -14,63 +14,66 @@
 #
 # WARNING! All changes made in this file will be lost!
 import os
-
-from PyQt5 import QtCore, QtWidgets
-from PyQt5.Qt import QApplication, QDesktopWidget, QThread
+from PyQt5 import QtCore
+from PyQt5.Qt import QApplication
 import sys
+from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QVBoxLayout, \
+    QHBoxLayout
 from utils.custom_widget import TransparentButton, UntitleWindow, Toast
 from utils.utils import get_date, get_time
-from utils.clock_thread import Clock,ClockThread,test_thread
-from PyQt5.QtCore import QTimer, Qt
+from utils.clock_thread import ClockThread
+from PyQt5.QtCore import Qt
 import logging
-import time
 import platform
+from config import IS_FULL
+
 
 class Ui_Timeout(UntitleWindow):
-    def __init__(self,parent=None):
+    def __init__(self, parent=None):
         super().__init__()
         self.setup()
 
-
     def setup(self):
         # 暂时不是区分 mac 和 linux
-        if platform.system().lower()  == 'windows':
+        if platform.system().lower() == 'windows':
             self.read_qss(filename='./qss/win_timeout.qss')
         else:
             self.read_qss(filename='./qss/timeout.qss')
+        print(self.parent())
         self.setupUi()
         self.clock = None
         self.set_models()
         self.set_connect()
 
-
     def setupUi(self):
-        self.setObjectName("top_widget_h")
+        self.setObjectName("top_win")
         self.resize(551, 261)
         self.setStyleSheet(self.qss)
-        self.gridLayoutWidget = QtWidgets.QWidget(self)
+        self.gridLayoutWidget = QWidget(self)
+        logging.warning('gridLayoutWidget sheet {}'.format(
+            self.gridLayoutWidget.styleSheet()))
         self.gridLayoutWidget.setGeometry(QtCore.QRect(10, 10, 511, 221))
         self.gridLayoutWidget.setObjectName("gridLayoutWidget")
-        self.gridLayout = QtWidgets.QGridLayout(self.gridLayoutWidget)
+        self.gridLayout = QGridLayout(self.gridLayoutWidget)
         self.gridLayout.setContentsMargins(0, 0, 0, 0)
         self.gridLayout.setObjectName("gridLayout")
-        self.lab_date = QtWidgets.QLabel(self.gridLayoutWidget)
+        self.lab_date = QLabel(self.gridLayoutWidget)
         self.lab_date.setAlignment(
             QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
         self.lab_date.setObjectName("lab_date")
         self.gridLayout.addWidget(self.lab_date, 0, 0, 1, 1)
-        self.verticalLayout = QtWidgets.QVBoxLayout()
-        self.lab_time = QtWidgets.QLabel(self.gridLayoutWidget)
+        self.verticalLayout = QVBoxLayout()
+        self.lab_time = QLabel(self.gridLayoutWidget)
         self.lab_time.setAlignment(QtCore.Qt.AlignHCenter | QtCore.Qt.AlignTop)
         self.lab_time.setFixedHeight(100)
         self.lab_time.setObjectName("lab_time")
-        self.lab_tips = QtWidgets.QLabel(self.gridLayoutWidget)
+        self.lab_tips = QLabel(self.gridLayoutWidget)
         self.lab_tips.setAlignment(QtCore.Qt.AlignHCenter | QtCore.Qt.AlignTop)
         self.lab_tips.setObjectName("lab_tips")
         self.verticalLayout.addWidget(self.lab_time)
         self.verticalLayout.addWidget(self.lab_tips)
         self.gridLayout.addLayout(self.verticalLayout, 1, 1, 2, 2)
-        self.horizontalLayout = QtWidgets.QHBoxLayout()
+        self.horizontalLayout = QHBoxLayout()
         self.btn_pass = TransparentButton(self.gridLayoutWidget)
         self.btn_pass.setObjectName("btn_pass")
         self.btn_pass.setFixedWidth(60)
@@ -84,16 +87,24 @@ class Ui_Timeout(UntitleWindow):
         QtCore.QMetaObject.connectSlotsByName(self)
         self.setWindowFlags(Qt.FramelessWindowHint)
 
+        width = QApplication.desktop().availableGeometry().width()
+        height = QApplication.desktop().availableGeometry().height()
+        if IS_FULL:
+            screen_rate = 1
+        else:
+            screen_rate = 0.8
+        self.resize(int(width * screen_rate), int(height * screen_rate))
+        self.gridLayoutWidget.setGeometry(
+            QtCore.QRect(20, 20, int(width * screen_rate) - 40,
+                         int(height * screen_rate) - 40))
 
     def retranslateUi(self):
         _translate = QtCore.QCoreApplication.translate
         self.lab_date.setText("%s" % get_date())
         self.lab_time.setText("{}".format(get_time()))
-        self.lab_tips.setText("""今日咖啡\n危地马拉 安提瓜花神咖啡（Guatemala La Minita La Folie）\n产区： 安提瓜（Antigua）火山区\n庄园： 拉米尼塔（La Minita） \n出口： 拉米妮塔（La Minita）集团的品牌"花神"\n品种：   Caturra, Catuai, Borbon\n波旁、卡杜拉、卡杜艾\n海拔：   1200至1600米\n等级：  欧规水洗极硬豆（SHB）\n处理法：传统式水洗处理
-        """)
+        self.lab_tips.setText("""还在考虑放什么内容,先喝杯咖啡吧\n躺着吧，万一需求消失了呢。""")
         self.btn_pass.setText("Pass")
         self.btn_later.setText("Later 10 min")
-
 
     def set_connect(self):
         self.btn_pass.clicked.connect(self.hide)
@@ -102,32 +113,23 @@ class Ui_Timeout(UntitleWindow):
 
     def show(self):
         try:
-            width = QApplication.desktop().screenGeometry().width()
-            height = QApplication.desktop().screenGeometry().height()
-            self.resize(int(width * 0.8), int(height * 0.8))
-            self.gridLayoutWidget.setGeometry(
-                QtCore.QRect(20, 20, int(width * 0.8) - 40, int(height * 0.8) - 40))
-            self.raise_()
+            self.read_qss(filename='./qss/timeout.qss')
+            self.setStyleSheet(self.qss)
             super().show()
+            self.activateWindow()
+            self.raise_()
         except Exception as e:
             logging.error(e)
 
     def update_ui(self):
         self.lab_date.setText("%s" % get_date())
         self.lab_time.setText("{}".format(get_time()))
-        # if "top_widget_h" == self.objectName():
-        #     self.setObjectName('top_widget_d')
-        # else:
-        #     self.setObjectName('top_widget_h')
-        # self.setStyleSheet(self.qss)
         logging.debug('update date')
 
-
     def set_models(self):
-        self.__thread = test_thread()
+        self.__thread = ClockThread()
         self.__thread.start()
         pass
-
 
     def read_qss(self, filename='') -> None:
         if not filename:
@@ -135,14 +137,12 @@ class Ui_Timeout(UntitleWindow):
         with open(filename, encoding='utf-8') as f:
             self.qss = f.read()
 
-
     def hide(self) -> None:
-        # self.__thread.stop()
+        # self.__thread.stop()  # 停止后重启会有问题，暂不解决 to deal
         super().hide()
 
-
     def dev_later(self):
-        Toast(self).show_toast('功能正在开发中，不要着急先喝杯咖啡', 2000)
+        Toast(self).show_toast('功能正在开发中，不要着急，先喝杯咖啡', 2000)
 
 
 if __name__ == "__main__":

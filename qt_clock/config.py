@@ -13,3 +13,6 @@ MISSION_CONFIG = 'mission.json'
 
 logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s %(levelname)s %(filename)s %(funcName)s %(message)s')
+
+# 是否全屏
+IS_FULL = False

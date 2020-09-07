@@ -17,15 +17,19 @@ import os
 from PyQt5 import QtCore
 from PyQt5.Qt import QApplication
 import sys
-from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QVBoxLayout, \
-    QHBoxLayout
-from utils.custom_widget import TransparentButton, UntitleWindow, Toast
+from PyQt5.QtWidgets import QGridLayout, QHBoxLayout, QLabel, QListWidget, QListWidgetItem, QVBoxLayout, QWidget
+from utils.custom_widget import TransparentButton, UntitleWindow, Toast, TodoListWidgetItem
 from utils.utils import get_date, get_time
 from utils.clock_thread import ClockThread
 from PyQt5.QtCore import Qt
 import logging
 import platform
 from config import IS_FULL
+from utils.aps import MYAPS
+from utils.mission import TIME_MISSION
+from custom_widget.Transparent import TransparentFactory
+from datetime import datetime, timedelta
+from PyQt5.QtGui import QFont
 
 
 class Ui_Timeout(UntitleWindow):
@@ -39,7 +43,6 @@ class Ui_Timeout(UntitleWindow):
             self.read_qss(filename='./qss/win_timeout.qss')
         else:
             self.read_qss(filename='./qss/timeout.qss')
-        print(self.parent())
         self.setupUi()
         self.clock = None
         self.set_models()
@@ -47,11 +50,11 @@ class Ui_Timeout(UntitleWindow):
 
     def setupUi(self):
         self.setObjectName("top_win")
-        self.resize(551, 261)
+        # self.resize(551, 261)
         self.setStyleSheet(self.qss)
         self.gridLayoutWidget = QWidget(self)
-        logging.warning('gridLayoutWidget sheet {}'.format(
-            self.gridLayoutWidget.styleSheet()))
+        # logging.warning('gridLayoutWidget sheet {}'.format(
+        #     self.gridLayoutWidget.styleSheet()))
         self.gridLayoutWidget.setGeometry(QtCore.QRect(10, 10, 511, 221))
         self.gridLayoutWidget.setObjectName("gridLayoutWidget")
         self.gridLayout = QGridLayout(self.gridLayoutWidget)
@@ -67,11 +70,26 @@ class Ui_Timeout(UntitleWindow):
         self.lab_time.setAlignment(QtCore.Qt.AlignHCenter | QtCore.Qt.AlignTop)
         self.lab_time.setFixedHeight(100)
         self.lab_time.setObjectName("lab_time")
-        self.lab_tips = QLabel(self.gridLayoutWidget)
-        self.lab_tips.setAlignment(QtCore.Qt.AlignHCenter | QtCore.Qt.AlignTop)
-        self.lab_tips.setObjectName("lab_tips")
         self.verticalLayout.addWidget(self.lab_time)
-        self.verticalLayout.addWidget(self.lab_tips)
+        self.lab_title = QLabel(self.gridLayoutWidget)
+        self.lab_title.setAlignment(QtCore.Qt.AlignHCenter | QtCore.Qt.AlignTop)
+        self.lab_title.setObjectName("lab_title")
+        self.lab_title.setText('Yang wish list - Ho to do list')
+        self.verticalLayout.addWidget(self.lab_title)
+        # listWidget
+        qss = """
+        TransparentListWidget{
+            background:transparent;
+            selection-background-color:transparent;
+        }
+        """
+        self.listWidget_todo = TransparentFactory().get_widget('listWidget', qss=qss)
+        for mission_id, mission_config in TIME_MISSION.missions.items():
+            if mission_config['is_action']:
+                self.item = TodoListWidgetItem(parent=self.listWidget_todo)
+                self.listWidget_todo.setItemWidget(self.item,
+                                                   self.item.setupUi(mission_name=mission_config['mission_name']))
+        self.verticalLayout.addWidget(self.listWidget_todo)
         self.gridLayout.addLayout(self.verticalLayout, 1, 1, 2, 2)
         self.horizontalLayout = QHBoxLayout()
         self.btn_pass = TransparentButton(self.gridLayoutWidget)
@@ -85,7 +103,6 @@ class Ui_Timeout(UntitleWindow):
         self.gridLayout.addLayout(self.horizontalLayout, 3, 3, 1, 1)
         self.retranslateUi()
         QtCore.QMetaObject.connectSlotsByName(self)
-        self.setWindowFlags(Qt.FramelessWindowHint)
 
         width = QApplication.desktop().availableGeometry().width()
         height = QApplication.desktop().availableGeometry().height()
@@ -102,17 +119,20 @@ class Ui_Timeout(UntitleWindow):
         _translate = QtCore.QCoreApplication.translate
         self.lab_date.setText("%s" % get_date())
         self.lab_time.setText("{}".format(get_time()))
-        self.lab_tips.setText("""还在考虑放什么内容,先喝杯咖啡吧\n躺着吧，万一需求消失了呢。""")
+        # self.lab_title.setText("""还在考虑放什么内容,先喝杯咖啡吧\n躺着吧，万一需求消失了呢。""")
         self.btn_pass.setText("Pass")
         self.btn_later.setText("Later 10 min")
 
     def set_connect(self):
         self.btn_pass.clicked.connect(self.hide)
-        self.btn_later.clicked.connect(self.dev_later)
+        self.btn_later.clicked.connect(self.later_ten_min)
         self.__thread.overSignal.connect(self.update_ui)
 
     def show(self):
         try:
+            if IS_FULL:
+                self.move(0, 0)  # 移到主屏幕
+            self.refreash_data()
             self.read_qss(filename='./qss/timeout.qss')
             self.setStyleSheet(self.qss)
             super().show()
@@ -143,6 +163,22 @@ class Ui_Timeout(UntitleWindow):
 
     def dev_later(self):
         Toast(self).show_toast('功能正在开发中，不要着急，先喝杯咖啡', 2000)
+
+    def later_ten_min(self):
+        mission = {
+            'time': datetime.now()+timedelta(seconds=20),
+            'id': 'later_ten_min'
+        }
+        MYAPS.add_date_job(mission=mission)
+        self.hide()
+
+    def refreash_data(self):
+        self.listWidget_todo.clear()
+        for mission_id, mission_config in TIME_MISSION.missions.items():
+            if mission_config['is_action']:
+                self.item = TodoListWidgetItem(parent=self.listWidget_todo)
+                self.listWidget_todo.setItemWidget(self.item,
+                                                   self.item.setupUi(mission_name=mission_config['mission_name']))
 
 
 if __name__ == "__main__":

@@ -44,7 +44,7 @@ class clock_tray(QSystemTrayIcon):
         self.setContextMenu(self.main_menu)
 
     def set_icon(self):
-        self.setIcon(QIcon('./icon/clock.png'))
+        self.setIcon(QIcon('./images/clock.png'))
         pass
 
     def set_data(self):

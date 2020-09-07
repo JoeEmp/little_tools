@@ -39,7 +39,6 @@ def main():
         timeout_win = Ui_Timeout(tray)
         settings_win = Ui_Settings(tray)
         tran_win = TranSignalWidget()
-        print(tran_win.styleSheet())
         tran_win.showSignal.connect(timeout_win.show)
         win_dict = {"timeout_win": timeout_win, 'settings_win': settings_win}
         tray.set_menu(win_dict)

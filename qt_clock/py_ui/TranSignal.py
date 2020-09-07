@@ -7,4 +7,5 @@ class TranSignalWidget(QWidget):
     showSignal = pyqtSignal(str)
 
     def send_show_signal(self, mission_id=''):
+        self.mission_id = mission_id
         self.showSignal.emit(mission_id)

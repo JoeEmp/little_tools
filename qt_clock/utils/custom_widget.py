@@ -13,8 +13,9 @@ from PyQt5.QtGui import QMouseEvent
 from PyQt5.QtWidgets import QLineEdit, QListWidgetItem, QPushButton, QWidget, \
     QTimeEdit, QMainWindow
 from PyQt5 import QtCore, QtQuickWidgets, QtWidgets
-from utils.utils import cryptograph_text,get_full_datetime
+from utils.utils import cryptograph_text, get_full_datetime
 from PyQt5.Qt import QColor, QUrl
+from custom_widget.Transparent import TransparentFactory
 import json
 
 
@@ -35,6 +36,9 @@ class Transparent(object):
             self.qss = base_qss
         else:
             self.qss = qss
+
+    def set_parent(self, parent):
+        self.parent = parent
 
     def add_qss(self, qss):
         self.qss += qss
@@ -61,6 +65,10 @@ class UntitleWidget(QWidget):
     _endPos = None
     _isTracking = False
 
+    def __init__(self):
+        super().__init__()
+        self.setWindowFlags(Qt.FramelessWindowHint)
+
     # 重写移动事件
     def mouseMoveEvent(self, e: QMouseEvent):
         if self._startPos:
@@ -74,7 +82,7 @@ class UntitleWidget(QWidget):
 
     # 释放鼠标时做出判断保证正常贴边 bug：y轴没做限制
     def mouseReleaseEvent(self, e: QMouseEvent):
-        if e.button() == Qt.LeftButton:  
+        if e.button() == Qt.LeftButton:
             self._isTracking = False
             self._startPos = None
             self._endPos = None
@@ -84,6 +92,10 @@ class UntitleWindow(QMainWindow):
     _startPos = None
     _endPos = None
     _isTracking = False
+
+    def __init__(self, parent=None, flags=None):
+        super().__init__()
+        self.setWindowFlags(Qt.FramelessWindowHint)
 
     # 重写移动事件
     def mouseMoveEvent(self, e: QMouseEvent):
@@ -180,7 +192,7 @@ class TimeItem(QListWidgetItem):
             self.comboBox.setCurrentIndex(index)
             # to do
             if 'interval' == self.info['trigger']:
-                self.timeEdit.setTime(QTime(0,0).addSecs(self.info['time']))
+                self.timeEdit.setTime(QTime(0, 0).addSecs(self.info['time']))
             elif 'date' == self.info['trigger']:
                 logging.warning('暂不支持 date 设置')
             elif 'cron' == self.info['trigger']:
@@ -204,13 +216,15 @@ class TimeItem(QListWidgetItem):
         if 'sign' not in self.info.keys():
             self.info['createtime'] = get_full_datetime()
             # 存在json转jsonstr保留空格的情况，目前没有好办法，只能做替换
-            self.info['sign'] = cryptograph_text(json.dumps(self.info).replace(' ',''))
-            flag  = True
+            self.info['sign'] = cryptograph_text(
+                json.dumps(self.info).replace(' ', ''))
+            flag = True
         # 旧任务重新校验
         else:
             sign = self.info.pop('sign')
-            if sign != cryptograph_text(json.dumps(self.info).replace(' ','')):
-                self.info['sign'] = cryptograph_text(json.dumps(self.info).replace(' ',''))
+            if sign != cryptograph_text(json.dumps(self.info).replace(' ', '')):
+                self.info['sign'] = cryptograph_text(
+                    json.dumps(self.info).replace(' ', ''))
                 flag = True
         return flag
 
@@ -242,6 +256,72 @@ class TransparentLineEdit(QLineEdit, Transparent):
         super().add_qss(qss)
         # logging.info(self.qss)
         self.setStyleSheet(self.qss)
+
+
+class TodoListWidgetItem(QListWidgetItem):
+    def __init__(self, parent=None, *args, **kwargs):
+        super().__init__(parent)
+        self.parent = parent
+
+    def setupUi(self, *args, **kwargs):
+        try:
+            self.setSizeHint(QSize(self.parent.width() - 140, 30))
+        except Exception as e:
+            logging.warning(e)
+            self.setSizeHint(QSize(312, 25))
+        self.frame = QtWidgets.QFrame()
+        # self.frame.setStyleSheet('QFrame{background:rgba(0,0,0,0.25)}')
+        try:
+            self.frame.setGeometry(QtCore.QRect(
+                0, 0, self.parent.width(), 25))
+        except Exception as e:
+            logging.warning(e)
+            self.frame.setGeometry(QtCore.QRect(0, 0, 312, 25))
+        self.horizontalLayout = QtWidgets.QHBoxLayout(self.frame)
+        self.horizontalLayout.setContentsMargins(0, 0, 0, 0)
+        # self.lab = QtWidgets.QLabel(self.widget)
+        # self.lab.setMaximumWidth(4)
+        # self.lab.setMaximumHeight(16)
+        # self.lab.setStyleSheet('QLabel{background:#ffffff}')
+        # self.horizontalLayout.addWidget(self.lab)
+        self.radioButton = QtWidgets.QRadioButton(self.frame)
+        self.radioButton.setObjectName("radioButton")
+        self.radioButton.clicked.connect(self.complete)
+        self.horizontalLayout.addWidget(self.radioButton)
+        self.lineEdit = TransparentFactory().get_widget('LineEdit', parent=self.frame)
+        self.lineEdit.setObjectName("lineEdit")
+        qss = """
+        QLineEdit{
+            font-family: YouYuan;
+            color: #fff;
+            font-size: 16pt;
+            background:transparent;
+            border:0px;
+            border-bottom-color:#fff;
+        }
+        QLineEdit:hover{
+            font-family: YouYuan;
+            border:2px;
+            }
+        """
+        # 'QLineEdit:hover{font-family: YouYuan;color: #000;background:#fff;}'
+        self.lineEdit.setStyleSheet(qss)
+        mission_name = 'demo'
+        if 'mission_name' in kwargs.keys():
+            mission_name = kwargs['mission_name']
+        self.lineEdit.setText(mission_name)
+        self.horizontalLayout.addWidget(self.lineEdit)
+        return self.frame
+
+    def set_data(self, mission_name):
+        self.lineEdit.setText(mission_name)
+
+    def complete(self):
+        try:
+            row = self.parent.row(self)
+            self.parent.takeItem(row)
+        except Exception as e:
+            logging.warning(e)
 
 
 class Toast(object):
@@ -290,7 +370,7 @@ class Toast(object):
     def set_time(self, time):
         """设置显示时间."""
         if isinstance(time, int):
-            self.toast.rootObject().set_time(time) # 单位为毫秒
+            self.toast.rootObject().set_time(time)  # 单位为毫秒
         else:
             self.toast.rootObject().set_time(self.short)
             logging.warning('time类型不对 {}'.format(type(time)))

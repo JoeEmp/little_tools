@@ -44,7 +44,7 @@ def main():
         tray.set_menu(win_dict)
         set_aps(tran_win)
         timeout_win.show()
-        TIME_MISSION.set_mission()
+        TIME_MISSION.set_aps_mission()
         MYAPS.start()
         logging.debug('APS jobs {}'.format(MYAPS.get_jobs()))
         sys.exit(app.exec_())

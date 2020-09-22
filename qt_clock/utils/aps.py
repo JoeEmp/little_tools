@@ -8,10 +8,10 @@
 '''
 import logging
 import time
-
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.interval import IntervalTrigger
-
+from apscheduler.triggers.date import DateTrigger
+from apscheduler.triggers.cron import CronTrigger
 
 class my_aps(BackgroundScheduler):
     def __init__(self, gconfig={}, **options):
@@ -29,14 +29,9 @@ class my_aps(BackgroundScheduler):
         self.add_json_jobs(missions, widgets)
 
     def add_json_job(self, mission: dict, widget=None):
-        if not widget:
-            widget = self.__widget
         try:
-
             if 'interval' == mission['trigger']:
-                trigger = IntervalTrigger(seconds=mission['time'])
-                self.add_job(func=widget.send_show_signal, trigger=trigger,
-                             id=mission['id'])
+                self.add_interval_job(mission,widget)
                 logging.debug('interval 添加完成 id is {}'.format(mission['id']))
             elif 'cron' == mission['trigger']:
                 logging.warning('暂不支持 cron')
@@ -49,6 +44,8 @@ class my_aps(BackgroundScheduler):
         except KeyError as e:
             logging.error(e)
             logging.error('mission json error {}'.format(mission))
+        except TypeError as e:
+            logging.error(e)
 
     def add_json_jobs(self, missions, widgets=None):
         for mission_id in missions:
@@ -74,14 +71,26 @@ class my_aps(BackgroundScheduler):
         for mission in missions:
             self.update_mission(mission)
 
-    def add_interval_job(self):
-        pass
+    def add_interval_job(self,mission,widget=None):
+        if not widget:
+            widget = self.__widget
+        trigger = IntervalTrigger(seconds=mission['time'])
+        self.add_job(func=widget.send_show_signal, trigger=trigger,
+                             id=mission['id'])
 
-    def add_cron_job(self):
-        pass
+    def add_cron_job(self,mission,widget=None):
+        if not widget:
+            widget = self.__widget
+        trigger = DateTrigger(run_date=mission['time'])
+        self.add_job(func=widget.send_show_signal, trigger=trigger,
+                             id=mission['id'])
 
-    def add_date_job(self):
-        pass
+    def add_date_job(self,mission,widget=None):
+        if not widget:
+            widget = self.__widget
+        trigger = DateTrigger(run_date=mission['time'])
+        self.add_job(func=lambda:widget.send_show_signal(mission['id']), trigger=trigger,
+                             id=mission['id'])
 
 
 if ('Asi', 'a/S') == time.tzname:

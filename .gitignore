@@ -133,3 +133,5 @@ dmypy.json
 *.mp
 misson.json
 .DS_Store
+demo.*
+pkg.sh

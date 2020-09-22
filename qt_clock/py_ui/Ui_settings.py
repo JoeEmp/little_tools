@@ -109,12 +109,11 @@ class Ui_Settings(object):
         self.btn_cancel.setText(_translate("Form", "cancel"))
 
     def add_item(self, mission=None):
-        self.item = TimeItem(self.listWidget)
+        item = TimeItem(self.listWidget)
         if mission:
-            self.listWidget.setItemWidget(self.item,
-                                          self.item.setupUi(info=mission))
+            self.listWidget.setItemWidget(item, item.setupUi(info=mission))
         else:
-            self.listWidget.setItemWidget(self.item, self.item.setupUi())
+            self.listWidget.setItemWidget(item, item.setupUi())
 
     def del_item(self):
         cur_index = self.listWidget.currentRow()

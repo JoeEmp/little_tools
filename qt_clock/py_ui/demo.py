@@ -38,10 +38,10 @@ class Ui_Form(object):
         self.btn_pass.setMaximumSize(QtCore.QSize(80, 16777215))
         self.btn_pass.setObjectName("btn_pass")
         self.gridLayout.addWidget(self.btn_pass, 3, 2, 1, 1)
-        self.lab_tips = QtWidgets.QLabel(self.gridLayoutWidget)
-        self.lab_tips.setAlignment(QtCore.Qt.AlignHCenter|QtCore.Qt.AlignTop)
-        self.lab_tips.setObjectName("lab_tips")
-        self.gridLayout.addWidget(self.lab_tips, 2, 1, 1, 2)
+        self.lab_title = QtWidgets.QLabel(self.gridLayoutWidget)
+        self.lab_title.setAlignment(QtCore.Qt.AlignHCenter|QtCore.Qt.AlignTop)
+        self.lab_title.setObjectName("lab_title")
+        self.gridLayout.addWidget(self.lab_title, 2, 1, 1, 2)
         self.btn_later = QtWidgets.QPushButton(self.gridLayoutWidget)
         self.btn_later.setMaximumSize(QtCore.QSize(120, 16777215))
         self.btn_later.setObjectName("btn_later")
@@ -56,7 +56,7 @@ class Ui_Form(object):
         self.lab_time.setText(_translate("Form", "12:03:35"))
         self.lab_date.setText(_translate("Form", "2020-06-23"))
         self.btn_pass.setText(_translate("Form", "pass"))
-        self.lab_tips.setText(_translate("Form", "TextLabel"))
+        self.lab_title.setText(_translate("Form", "TextLabel"))
         self.btn_later.setText(_translate("Form", "10 min later"))
 
 if __name__ == "__main__":

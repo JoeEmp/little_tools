@@ -1,21 +1,21 @@
-QWidget#top_widget_h {
-    background-color: #53d37e;
-    border-radius: 15px;
+QMainWindow#top_win {
+    /* background-color: #53d37e; */
+    border-radius: 30px;
+    background-color: #516be2;
 }
 
-QWidget#top_widget_d {
-    background-color: #46b46a;
+QWidget {
     border-radius: 15px;
+    /* box-shadow: 120px 80px 40px 20px #00000057; */
 }
 
 QLabel {
     font-family: YouYuan;
-    color: #ffffff;
-    border: solid #000000 3px;
+    color: #fff;
 }
 
-QLabel#lab_tips {
-    font-size: 16pt
+QLabel#lab_title {
+    font-size: 20pt
 }
 
 QLabel#lab_date {

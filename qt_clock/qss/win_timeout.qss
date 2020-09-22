@@ -14,7 +14,7 @@ QLabel {
     border: solid #000000 3px;
 }
 
-QLabel#lab_tips {
+QLabel#lab_title {
     font-size: 16pt;
     font-family: SimSun;
 }
@@ -28,7 +28,7 @@ QLabel#lab_time {
     font-family: YouYuan;
 }
 
-QPushButton{
+QPushButton {
     font-family: SimHei;
     color: #ffffff;
 }

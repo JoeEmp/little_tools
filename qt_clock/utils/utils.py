@@ -17,15 +17,7 @@ import pytz
 from datetime import datetime
 
 def cryptograph_text(text):
-    """��ʱֻ�ṩmd5����.
-
-    Arguments:\n
-            text {str} -- ��Ҫ���ܵ��ı�
-
-    Returns:\n
-            str -- 密文或者空
-    """
-    # logging.debug(text)
+    """ md5(text). """
     m = hashlib.md5()
     m.update(text.encode('utf-8'))
     return m.hexdigest()
@@ -39,10 +31,8 @@ def get_datetime(date_format):
     else:
         return time.strftime(date_format, time.localtime(time.time()))
 
-
 def get_date():
     return get_datetime("%Y-%m-%d")
-
 
 def get_time():
     return get_datetime("%H:%M:%S")
@@ -50,19 +40,16 @@ def get_time():
 def get_full_datetime():
     return get_datetime("%Y-%m-%d %H:%M:%S")
 
-
-
 def set_app(app):
     # 关闭所有窗口,也不关闭应用程序
     app.setApplicationName('rest_clock')
     app.setApplicationDisplayName('rest_clock')
     QApplication.setQuitOnLastWindowClosed(False)
     icon = QtGui.QIcon()
-    icon.addPixmap(QtGui.QPixmap("./icon/clock.png"), QtGui.QIcon.Normal,
+    icon.addPixmap(QtGui.QPixmap("./images/clock.png"), QtGui.QIcon.Normal,
                    QtGui.QIcon.Off)
     app.setWindowIcon(icon)
-    # app.setWindowIcon(QIcon('./icon/clock.png'))
-
+    # app.setWindowIcon(QIcon('./images/clock.png'))
 
 if __name__ == "__main__":
     print(get_date())

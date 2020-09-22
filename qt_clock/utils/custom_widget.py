@@ -201,7 +201,7 @@ class TimeItem(QListWidgetItem):
         except Exception as e:
             logging.warning(e)
 
-    def update_info(self) -> dict:
+    def update_info(self) -> bool:
         flag = False
         if 'luck' == self.info['id']:
             self.info['id'] = cryptograph_text(str(int(time.time())))
@@ -215,17 +215,18 @@ class TimeItem(QListWidgetItem):
         # 新任务无sign
         if 'sign' not in self.info.keys():
             self.info['createtime'] = get_full_datetime()
-            # 存在json转jsonstr保留空格的情况，目前没有好办法，只能做替换
             self.info['sign'] = cryptograph_text(
-                json.dumps(self.info).replace(' ', ''))
+                json.dumps(self.info, ensure_ascii=False))
             flag = True
         # 旧任务重新校验
         else:
             sign = self.info.pop('sign')
-            if sign != cryptograph_text(json.dumps(self.info).replace(' ', '')):
+            if sign != cryptograph_text(json.dumps(self.info, ensure_ascii=False)):
                 self.info['sign'] = cryptograph_text(
-                    json.dumps(self.info).replace(' ', ''))
+                    json.dumps(self.info, ensure_ascii=False))
                 flag = True
+            else:
+                self.info['sign'] = sign
         return flag
 
     def set_connect(self):

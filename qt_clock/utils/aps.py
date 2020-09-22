@@ -13,6 +13,8 @@ from apscheduler.triggers.interval import IntervalTrigger
 from apscheduler.triggers.date import DateTrigger
 from apscheduler.triggers.cron import CronTrigger
 
+COMPUTER_TIEMZONE = ''
+
 class my_aps(BackgroundScheduler):
     def __init__(self, gconfig={}, **options):
         super().__init__(gconfig=gconfig, **options)
@@ -74,27 +76,28 @@ class my_aps(BackgroundScheduler):
     def add_interval_job(self,mission,widget=None):
         if not widget:
             widget = self.__widget
-        trigger = IntervalTrigger(seconds=mission['time'])
+        trigger = IntervalTrigger(seconds=mission['time'],timezone=COMPUTER_TIEMZONE)
         self.add_job(func=widget.send_show_signal, trigger=trigger,
                              id=mission['id'])
 
     def add_cron_job(self,mission,widget=None):
         if not widget:
             widget = self.__widget
-        trigger = DateTrigger(run_date=mission['time'])
+        trigger = DateTrigger(run_date=mission['time'],timezone=COMPUTER_TIEMZONE)
         self.add_job(func=widget.send_show_signal, trigger=trigger,
                              id=mission['id'])
 
     def add_date_job(self,mission,widget=None):
         if not widget:
             widget = self.__widget
-        trigger = DateTrigger(run_date=mission['time'])
+        trigger = DateTrigger(run_date=mission['time'],timezone=COMPUTER_TIEMZONE)
         self.add_job(func=lambda:widget.send_show_signal(mission['id']), trigger=trigger,
                              id=mission['id'])
 
-
+# for diff tzone
 if ('Asi', 'a/S') == time.tzname:
-    MYAPS = my_aps(timezone="Asia/Shanghai")
+    COMPUTER_TIEMZONE = "Asia/Shanghai"
+    MYAPS = my_aps(timezone=COMPUTER_TIEMZONE)
 else:
     MYAPS = my_aps()
 

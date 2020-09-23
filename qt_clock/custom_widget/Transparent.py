@@ -13,6 +13,7 @@ class TransparentFactory():
             return TransparentListWidget(*args,**kwargs)
         else:
             logging.warning('{} not in TransparentFactory'.format(widget_name))
+        return None
 
 class Transparent(object):
 

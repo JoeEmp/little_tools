@@ -1,11 +1,3 @@
-'''
-@Author: joe
-@Date: 2020-06-23 10:28:57
-@LastEditTime: 2020-06-29 17:26:20
-@LastEditors: Please set LastEditors
-@Description: In User Settings Edit
-@FilePath: /qt_clock/custom_widget.py
-'''
 import logging
 import time
 from PyQt5.QtCore import QPoint, Qt, QTime, QSize
@@ -17,106 +9,6 @@ from utils.utils import cryptograph_text, get_full_datetime
 from PyQt5.Qt import QColor, QUrl
 from custom_widget.Transparent import TransparentFactory
 import json
-
-
-class Transparent(object):
-
-    def set_base_qss(self, widget_name=None, qss=''):
-        """支持自定义qss."""
-        if not qss and widget_name:
-            base_qss = """
-            %s{
-                background:transparent;
-                border-width:0;
-                border-style:outset;}
-            %s:hover {  
-                background:white;
-                border-width:1;}
-            """ % (widget_name, widget_name)
-            self.qss = base_qss
-        else:
-            self.qss = qss
-
-    def set_parent(self, parent):
-        self.parent = parent
-
-    def add_qss(self, qss):
-        self.qss += qss
-
-
-class TransparentButton(Transparent, QPushButton):
-    def __init__(self, parent=None, qss=''):
-        super(QPushButton, self).__init__(parent)
-        if not qss:
-            qss = """QPushButton{
-                color:white;
-                background:transparent;
-                border-width:0;
-                font-size:20px;
-                text-decoration:underline;
-                border-style:outset;} """
-        self.set_base_qss(
-            widget_name=TransparentButton.__base__.__name__, qss=qss)
-        self.setStyleSheet(self.qss)
-
-
-class UntitleWidget(QWidget):
-    _startPos = None
-    _endPos = None
-    _isTracking = False
-
-    def __init__(self):
-        super().__init__()
-        self.setWindowFlags(Qt.FramelessWindowHint)
-
-    # 重写移动事件
-    def mouseMoveEvent(self, e: QMouseEvent):
-        if self._startPos:
-            self._endPos = e.pos() - self._startPos
-            self.move(self.pos() + self._endPos)
-
-    def mousePressEvent(self, e: QMouseEvent):
-        if e.button() == Qt.LeftButton:
-            self._isTracking = True
-            self._startPos = QPoint(e.x(), e.y())
-
-    # 释放鼠标时做出判断保证正常贴边 bug：y轴没做限制
-    def mouseReleaseEvent(self, e: QMouseEvent):
-        if e.button() == Qt.LeftButton:
-            self._isTracking = False
-            self._startPos = None
-            self._endPos = None
-
-
-class UntitleWindow(QMainWindow):
-    _startPos = None
-    _endPos = None
-    _isTracking = False
-
-    def __init__(self, parent=None, flags=None):
-        super().__init__()
-        self.setWindowFlags(Qt.FramelessWindowHint)
-
-    # 重写移动事件
-    def mouseMoveEvent(self, e: QMouseEvent):
-        # if not self.geometry().contains(self.pos()):
-        if self._startPos:
-            self._endPos = e.pos() - self._startPos
-            self.move(self.pos() + self._endPos)
-
-    def mousePressEvent(self, e: QMouseEvent):
-        if e.button() == Qt.LeftButton:  # and not self.geometry().contains(self.pos()):
-            self._isTracking = True
-            self._startPos = QPoint(e.x(), e.y())
-
-    # 释放鼠标时做出判断保证正常贴边 bug：y轴没做限制
-    def mouseReleaseEvent(self, e: QMouseEvent):
-        if e.button() == Qt.LeftButton:  # and not self.geometry().contains(self.pos()):
-            self._isTracking = False
-            self._startPos = None
-            self._endPos = None
-        # print(self.x(), self.y())
-
 
 class TimeItem(QListWidgetItem):
     def __init__(self, parent=None, *args, **kwargs):
@@ -181,9 +73,9 @@ class TimeItem(QListWidgetItem):
                 "is_action": False,
                 "mission_name": 'new mission'
             }
-        self.set_ui()
+        self.set_def_config()
 
-    def set_ui(self):
+    def set_def_config(self):
         try:
             self.radioButton.setChecked(self.info['is_action'])
             self.radio_check()
@@ -239,24 +131,6 @@ class TimeItem(QListWidgetItem):
         else:
             self.radioButton.setStyleSheet('QRadioButton{color:red}')
             self.radioButton.setText('禁用')
-
-
-class TransparentLineEdit(QLineEdit, Transparent):
-
-    def __init__(self, parent=None, qss=''):
-        super(QLineEdit, self).__init__(parent)
-        self.set_base_qss(
-            widget_name=TransparentLineEdit.__base__.__name__, qss=qss)
-        self.setStyleSheet(self.qss)
-
-    def leaveEvent(self, QEvent):
-        super().leaveEvent(QEvent)
-        self.clearFocus()
-
-    def add_qss(self, qss):
-        super().add_qss(qss)
-        # logging.info(self.qss)
-        self.setStyleSheet(self.qss)
 
 
 class TodoListWidgetItem(QListWidgetItem):
@@ -323,55 +197,3 @@ class TodoListWidgetItem(QListWidgetItem):
             self.parent.takeItem(row)
         except Exception as e:
             logging.warning(e)
-
-
-class Toast(object):
-    """Toast控件."""
-    Long = 2000
-    Short = 1000
-
-    def __init__(self, parent, qml=''):
-        """初始化widget.
-
-        :param parent: 显示窗口
-        :param qml: 具体加载的qml 默认为 'GUI/py_ui/toast.qml'
-        """
-        self.toast = QtQuickWidgets.QQuickWidget(parent)
-        # 设置为透明和允许显示
-        self.toast.setClearColor(QColor(Qt.transparent))
-        self.toast.setAttribute(Qt.WA_AlwaysStackOnTop)
-        self.parent = parent
-        if not qml:
-            qml = './py_ui/toast.qml'
-        self.toast.setSource(QUrl(qml))
-        # widget是透明的，可以先设置状态
-        self.show()
-
-    def show(self):
-        self.toast.show()
-
-    def show_toast(self, text, time=Short):
-        try:
-            self.set_time(time)
-            self.toast.rootObject().set_text(text)
-            self.toast.move(int((self.parent.width() - self.width()) / 2),
-                            int(self.parent.height() * 0.085))
-            self.toast.rootObject().show_toast()
-        except Exception as e:
-            logging.error(e)
-
-    def width(self):
-        try:
-            return self.toast.rootObject().width()
-        except Exception as e:
-            logging.error(e)
-            return 5
-        return self.toast.rootObject()
-
-    def set_time(self, time):
-        """设置显示时间."""
-        if isinstance(time, int):
-            self.toast.rootObject().set_time(time)  # 单位为毫秒
-        else:
-            self.toast.rootObject().set_time(self.short)
-            logging.warning('time类型不对 {}'.format(type(time)))

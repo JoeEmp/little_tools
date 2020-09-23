@@ -18,7 +18,7 @@ from PyQt5 import QtCore
 from PyQt5.Qt import QApplication
 import sys
 from PyQt5.QtWidgets import QGridLayout, QHBoxLayout, QLabel, QListWidget, QListWidgetItem, QVBoxLayout, QWidget
-from utils.custom_widget import TransparentButton, UntitleWindow, Toast, TodoListWidgetItem
+from custom_widget.ListItem import TodoListWidgetItem
 from utils.utils import get_date, get_time
 from utils.clock_thread import ClockThread
 from PyQt5.QtCore import Qt
@@ -28,11 +28,13 @@ from config import IS_FULL
 from utils.aps import MYAPS
 from utils.mission import TIME_MISSION
 from custom_widget.Transparent import TransparentFactory
+from custom_widget.Untitle import UntitleMainWindow
+from custom_widget.Toast import Toast
 from datetime import datetime, timedelta
 from PyQt5.QtGui import QFont
 
 
-class Ui_Timeout(UntitleWindow):
+class Ui_Timeout(UntitleMainWindow):
     def __init__(self, parent=None):
         super().__init__()
         self.setup()
@@ -92,10 +94,10 @@ class Ui_Timeout(UntitleWindow):
         self.verticalLayout.addWidget(self.listWidget_todo)
         self.gridLayout.addLayout(self.verticalLayout, 1, 1, 2, 2)
         self.horizontalLayout = QHBoxLayout()
-        self.btn_pass = TransparentButton(self.gridLayoutWidget)
+        self.btn_pass = TransparentFactory().get_widget('Button')
         self.btn_pass.setObjectName("btn_pass")
         self.btn_pass.setFixedWidth(60)
-        self.btn_later = TransparentButton(self.gridLayoutWidget)
+        self.btn_later = TransparentFactory().get_widget('Button')
         self.btn_later.setObjectName("btn_later")
         self.btn_later.setMinimumWidth(120)
         self.horizontalLayout.addWidget(self.btn_pass)
@@ -169,8 +171,9 @@ class Ui_Timeout(UntitleWindow):
             'time': datetime.now()+timedelta(seconds=20),
             'id': 'later_ten_min'
         }
-        MYAPS.add_date_job(mission=mission)
-        self.hide()
+        # MYAPS.add_date_job(mission=mission)
+        self.dev_later()
+        # self.hide()
 
     def refreash_data(self):
         self.listWidget_todo.clear()

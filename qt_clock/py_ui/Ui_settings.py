@@ -10,7 +10,8 @@ from PyQt5.Qt import QApplication
 import sys
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QPushButton, \
     QListWidget
-from utils.custom_widget import TimeItem, Toast
+from custom_widget.ListItem import TimeItem
+from custom_widget.Toast import Toast
 from utils.mission import TIME_MISSION
 
 

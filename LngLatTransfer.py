@@ -1,17 +1,13 @@
-'''
-@Author: your name
-@Date: 2020-02-27 14:05:09
-@LastEditTime: 2020-06-05 10:34:52
-@LastEditors: Please set LastEditors
-@Description: In User Settings Edit
-@FilePath: /test_script/api_sql/utils/LngLatTransfer.py
-'''
 import math
 from math import radians, cos, sin, asin, sqrt
 
 
 class LngLatTransfer():
-    """ WGS84、GCJ02（火星坐标系）、BD09（百度坐标系）以及百度地图中保存矢量信息的web墨卡托 """
+    """ WGS84（gps、苹果芯片提供gps）、
+        GCJ02（火星坐标系、腾讯以及高德使用）、
+        BD09（北斗坐标系、百度使用）
+        以及百度地图中保存矢量信息的web墨卡托转WGS84
+    """
 
     def __init__(self):
         self.x_pi = 3.14159265358979324 * 3000.0 / 180.0
